@@ -15,13 +15,6 @@ a2d(){
 	printf "%d\n" \'$1
 }
 
-killffmpeg(){
-	for pid in `pgrep ffmpeg`
-	do
-	 sudo kill -9 $pid
-	done
-}
-
 f_left(){((X-=STEP));}
 f_right(){((X+=STEP));}
 f_up(){((Y-=STEP));}
@@ -56,22 +49,27 @@ MP[$(a2d j)]=f_hdown
 MP[$(a2d m)]=f_sup
 MP[$(a2d n)]=f_sdown
 
-MP[$(a2d l)]=break
+MP[$(a2d b)]=break
 
 function adjust(){
-	ffplay /dev/video6 &
+	ffplay -nostats -hide_banner -loglevel error "$1" &
 	while true
 	do
-		sudo ffmpeg -nostats -hide_banner -loglevel error -f x11grab -r 60 -s "$W"x"$H" -i :0.0+$X,$Y -vcodec rawvideo -pix_fmt yuv420p -threads 0 -f v4l2 -vf scale=640:480 "/dev/video6" &
+		sudo ffmpeg -nostats -hide_banner -loglevel error -f x11grab -r 60 -s "$W"x"$H" -i :0.0+$X,$Y -vcodec rawvideo -pix_fmt yuv420p -threads 0 -f v4l2 -vf scale=640:480 "$1" &
 		keynum=$(readkeynum)
+		for pid in $(jobs -p | grep -v $(jobs -p %1))
+		do
+			cpid=$(pgrep -P $pid)
+			[ -z "$cpid" ] && continue #if cpid is empty, continue
+			sudo kill $cpid
+		done
 		${MP[keynum]}
-		killffmpeg
-		echo "TOP LEFT -->> $X,$Y"
-		echo "WIDTH,HEIGHT -->> $W,$H"
-		echo "STEP -->> $STEP"
+		>&2 echo "TOP LEFT -->> $X,$Y"
+		>&2 echo "WIDTH,HEIGHT -->> $W,$H"
+		>&2 echo "STEP -->> $STEP"
 	done
 	kill $(pgrep ffplay)
-	killffmpeg
 }
 
-adjust
+adjust "$1"
+echo "$X,$Y,$W,$H"
