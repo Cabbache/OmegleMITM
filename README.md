@@ -1,5 +1,5 @@
 # OmegleMITM
-Spy on Omegle strangers from a Linux pc by MITM
+Spy on Omegle stranger's video calls from a Linux pc by MITM
 
 ## Usage
 Assumes you're using Firefox.
@@ -33,3 +33,4 @@ The script needs much more work for user friendliness and is still in its early 
 ### Warnings ###
 * Beware it does not clean up background processes.
 * You can easily get your IP banned using this.
+* The script does not support text based MITM.
