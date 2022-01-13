@@ -8,6 +8,22 @@ get_changes(){
 	(echo "$1" && echo "$2") | sort | uniq -c | sed 's/^ *//g' | grep ^1 | cut -d' ' -f2
 }
 
+exitdn(){
+	echo "Could not find dependency '$1'"
+	exit
+}
+
+check_dep(){
+	command -v "$1" > /dev/null || exitdn "$1"
+}
+
+check_deps(){
+	check_dep "ffmpeg"
+	check_dep "pacmd"
+	check_dep "ffplay"
+	#you might also need to apt install v4l2loopback-dkms
+}
+
 check_changes(){
 	while true
 	do
@@ -18,19 +34,19 @@ check_changes(){
 	done
 }
 
+check_deps
+
 check_changes &
 
+#create virtual cameras in /dev/videoX
 MAX=$(ls /dev/video* | sort -Vr | head -n1 | sed 's/\/dev\/video//g')
 video1=$((MAX + 1))
 video2=$((MAX + 2))
-
-#create virtual cameras
 sudo modprobe v4l2loopback video_nr=$video1,$video2 card_label="MITM video 1","MITM video 2" exclusive_caps=1
 
 #create virtual audio sinks
 pacmd load-module module-remap-sink sink_name=MITM_sink_1
 pacmd update-source-proplist MITM_sink_1.monitor device.description=MITM_mic_1
-
 pacmd load-module module-remap-sink sink_name=MITM_sink_2
 pacmd update-source-proplist MITM_sink_2.monitor device.description=MITM_mic_2
 
@@ -55,7 +71,5 @@ sudo ffmpeg -nostats -hide_banner -loglevel error -f x11grab -r 60 -s "$W2"x"$H2
 read -p "sink-input index of tab1: " index1
 read -p "sink-input index of tab2: " index2
 
-#make sure to enter the index of correct tab,
-#otherwise strangers will hear themselves
 pacmd move-sink-input $index2 MITM_sink_1
 pacmd move-sink-input $index1 MITM_sink_2
