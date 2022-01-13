@@ -57,5 +57,5 @@ read -p "sink-input index of tab2: " index2
 
 #make sure to enter the index of correct tab,
 #otherwise strangers will hear themselves
-pacmd move-sink-input $index2 MITM_sink_1.monitor
-pacmd move-sink-input $index1 MITM_sink_2.monitor
+pacmd move-sink-input $index2 MITM_sink_1
+pacmd move-sink-input $index1 MITM_sink_2
