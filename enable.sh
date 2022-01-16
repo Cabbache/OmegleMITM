@@ -81,8 +81,12 @@ do
 	read -p '>> ' ent
 	if [ $ent == 1 ]; then
 		PID=$PID1
+		WIDTH=$W1
+		HEIGHT=$H1
 	elif [ $ent == 2 ]; then
 		PID=$PID2
+		WIDTH=$W2
+		HEIGHT=$H2
 	else
 		echo "Invalid number, neither 1 or 2"
 		continue
@@ -90,7 +94,7 @@ do
 	VIDEO="/dev/video$((MAX+ent))"
 
 	sudo kill -STOP $(pgrep -P "$PID") #pause MITM stream
-	sudo ffmpeg -nostats -hide_banner -loglevel error -f v4l2 -i /dev/video0 -vf "format=yuv420p,scale=640:480" -f v4l2 "$VIDEO" &
+	sudo ffmpeg -nostats -hide_banner -loglevel error -f v4l2 -i /dev/video0 -vf "format=yuv420p,scale=$WIDTH:$HEIGHT" -f v4l2 "$VIDEO" &
 	echo "streaming /dev/video0 to $VIDEO"
 	read -rsn1 #pause until key enter
 	sudo kill -9 $(pgrep -P $!)
