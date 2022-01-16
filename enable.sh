@@ -1,4 +1,4 @@
-#!/bin/sh
+#!/bin/bash
 
 get_inputs(){
 	pacmd list-sink-inputs | grep index | grep -Eo '[0-9]+'
@@ -58,6 +58,7 @@ W1=$(echo "$E1" | cut -d, -f3)
 H1=$(echo "$E1" | cut -d, -f4)
 
 sudo ffmpeg -nostats -hide_banner -loglevel error -f x11grab -r 60 -s "$W1"x"$H1" -i :0.0+$X1,$Y1 -vcodec rawvideo -pix_fmt yuv420p -threads 0 -f v4l2 "/dev/video$video1" &
+PID1=$!
 
 E2=$(./assist.sh "/dev/video$video2")
 
@@ -67,9 +68,31 @@ W2=$(echo "$E2" | cut -d, -f3)
 H2=$(echo "$E2" | cut -d, -f4)
 
 sudo ffmpeg -nostats -hide_banner -loglevel error -f x11grab -r 60 -s "$W2"x"$H2" -i :0.0+$X2,$Y2 -vcodec rawvideo -pix_fmt yuv420p -threads 0 -f v4l2 "/dev/video$video2" &
+PID2=$!
 
 read -p "sink-input index of tab1: " index1
 read -p "sink-input index of tab2: " index2
 
 pacmd move-sink-input $index2 MITM_sink_1
 pacmd move-sink-input $index1 MITM_sink_2
+
+while true
+do
+	read -p '>> ' ent
+	if [ $ent == 1 ]; then
+		PID=$PID1
+	elif [ $ent == 2 ]; then
+		PID=$PID2
+	else
+		echo "Invalid number, neither 1 or 2"
+		continue
+	fi
+	VIDEO="/dev/video$((MAX+ent))"
+
+	sudo kill -STOP $(pgrep -P "$PID") #pause MITM stream
+	sudo ffmpeg -nostats -hide_banner -loglevel error -f v4l2 -i /dev/video0 -vf "format=yuv420p,scale=640:480" -f v4l2 "$VIDEO" &
+	echo "streaming /dev/video0 to $VIDEO"
+	read -rsn1 #pause until key enter
+	sudo kill -9 $(pgrep -P $!)
+	sudo kill -CONT $(pgrep -P "$PID") #continue MITM stream
+done
