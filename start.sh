@@ -109,10 +109,10 @@ pp(){
 
 setup
 
-#vv 1 | to stream camera to tab 1
-#vv 2 | to stream camera to tab 2
-#pp file.wav 1 | to play sound from file.wav to tab 1
-#pp file.wav 2 | to play sound from file.wav to tab 2
+#vv 1 - to stream camera to video 1, press any key to stop
+#vv 2 - to stream camera to video 2, press any key to stop
+#pp file.wav 1 - to play sound from file.wav to mic 1
+#pp file.wav 2 - to play sound from file.wav to mic 2
 
 while true
 do
