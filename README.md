@@ -4,7 +4,7 @@ Spy on Omegle stranger's video calls from a Linux pc by MITM
 ## Usage
 Assumes you're using Firefox.
 
-1. Run enable.sh.
+1. Run start.sh.
 2. Open two Omegle tabs on video chat in a suitable place on the screen but do not give the browser any permissions.
 3. Adjust the screen crop to one of the tabs(call it tab A). To adjust it, make the terminal in focus and use WASD,UHJK and NM
 4. Press 'B' once finished adjusting.
