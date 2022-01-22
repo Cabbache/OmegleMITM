@@ -21,6 +21,7 @@ check_deps(){
 	check_dep "ffmpeg"
 	check_dep "pacmd"
 	check_dep "ffplay"
+	check_dep "play"
 	#you might also need to apt install v4l2loopback-dkms
 }
 

@@ -31,6 +31,7 @@ document.getElementById("othervideo").style.borderRadius = 0;
 * v4l2loopback-dkms
 * pacmd
 * pulseaudio
+* sox/play
 
 ## Some thoughts & info
 The script needs much more work for user friendliness and is still in its early stages. However, it was inspired from a need to an alternative to OBS studio. With little or no modification, the script can be used to MITM other video call applications.
